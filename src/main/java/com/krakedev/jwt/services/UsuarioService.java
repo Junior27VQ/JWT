@@ -1,5 +1,6 @@
 package com.krakedev.jwt.services;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import com.krakedev.jwt.entidades.Usuario;
 import com.krakedev.jwt.repositories.UsuarioRepository;
@@ -16,6 +17,9 @@ public class UsuarioService {
     }
 
     public Usuario guardar(Usuario usuario) {
+    	String contrasena = BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt());
+    	usuario.setPassword(contrasena);
+    	
         return usuarioRepo.save(usuario);
     }
 
