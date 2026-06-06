@@ -30,7 +30,7 @@ public class UsuarioService {
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
             // Validación básica de contraseña
-            if (usuario.getPassword().equals(password)) {
+            if (BCrypt.checkpw(password, usuario.getPassword())) {
                 return usuario;
             }
         }
