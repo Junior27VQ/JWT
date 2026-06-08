@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.krakedev.jwt.entidades.Usuario;
+import com.krakedev.jwt.services.TokenBlackListService;
 import com.krakedev.jwt.services.UsuarioService;
 import com.krakedev.jwt.utils.JwtUtil;
 
@@ -20,10 +21,12 @@ import com.krakedev.jwt.utils.JwtUtil;
 @RequestMapping("/auth")
 public class AuthController {
 	private final UsuarioService userService;
+	private final TokenBlackListService blacklist;
 
-	public AuthController(UsuarioService userService) {
+	public AuthController(UsuarioService userService, TokenBlackListService blacklist) {
 		super();
 		this.userService = userService;
+		this.blacklist = blacklist;
 	}
 	
 	@PostMapping("/registrar")
@@ -76,5 +79,16 @@ public class AuthController {
 				"Estatus", "Autenticado corectamente"
 				));
 	}
+	
+	@PostMapping("/logout")
+	public ResponseEntity<?> lohout(@RequestHeader(value = "Authorization", required = false) String authHeader){
+		if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+			String token = authHeader.substring(7);
+			blacklist.invalidarToken(token);
+			return ResponseEntity.ok(Map.of("Mensaje", "Secion cerrada Exitosamente. Token Invalidado."));
+		}else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token no proporcionado.");
+		}
+	};
 	
 }
